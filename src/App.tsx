@@ -1,19 +1,51 @@
-import Header from "./components/auth/Header";
 import LoginForm from "./components/auth/LoginForm";
-import { Button } from "./components/ui/button";
-import useLocalStorage from "./hooks/useLocalStorage";
+import Header from "./components/auth/Header";
+import AppLayout from "./components/layout/AppLayout";
+import MedicationForm from "./components/medications/MedicationForm";
+import MedicationList from "./components/medications/MedicationList";
+import VitalsForm from "./components/vitals/VitalsForm";
+import VitalsLog from "./components/vitals/VitalsLog";
+import useAuth from "./hooks/useAuth";
+import useMedications from "./hooks/useMedications";
+import useVitals from "./hooks/useVitals";
+import useInactivityTimer from "./hooks/useInactivityTimer";
 
-const App = () => {
-  const [count, setCount] = useLocalStorage("test-count", 0);
+function App() {
+  const { currentUser, login, logout, isAuthenticated } = useAuth();
+  const { medications, addMedication, removeMedication } =
+    useMedications(currentUser);
+  const { vitals, addVitalSigns } = useVitals(currentUser);
+
+  // Auto-logout after 5 minutes of inactivity
+  useInactivityTimer(logout, isAuthenticated);
+
+  if (!isAuthenticated) {
+    return <LoginForm onLogin={login} />;
+  }
+
   return (
-    <div className="p-10">
-      <p>Count: {count}</p>
-      <Button onClick={() => setCount(count + 1)}>Increment</Button>
-      <Button onClick={() => setCount(0)}>Reset</Button>
-      <Header username="TestUser" onLogout={() => alert("Logged out")} />
-      <LoginForm onLogin={(username) => alert(`Logged in as ${username}`)} />
+    <div className="min-h-screen bg-gray-50">
+      <Header username={currentUser!} onLogout={logout} />
+      <AppLayout>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Medications Section */}
+          <div className="space-y-6">
+            <MedicationForm onSubmit={addMedication} />
+            <MedicationList
+              medications={medications}
+              onRemove={removeMedication}
+            />
+          </div>
+
+          {/* Vitals Section */}
+          <div className="space-y-6">
+            <VitalsForm onSubmit={addVitalSigns} />
+            <VitalsLog vitals={vitals} />
+          </div>
+        </div>
+      </AppLayout>
     </div>
   );
-};
+}
 
 export default App;
