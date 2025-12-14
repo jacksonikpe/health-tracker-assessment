@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import { StorageKeys } from "@/lib/utils";
 import useLocalStorage from "./useLocalStorage";
 import type { Medication, MedicationFormData } from "@/types";
@@ -11,6 +13,18 @@ const useMedications = (username: string | null) => {
     storageKey,
     []
   );
+
+  // Force re-read from localStorage when username changes
+  useEffect(() => {
+    try {
+      const item = window.localStorage.getItem(storageKey);
+      const data = item ? JSON.parse(item) : [];
+      setMedications(data);
+    } catch (error) {
+      console.error("Error loading medications:", error);
+      setMedications([]);
+    }
+  }, [setMedications, storageKey]);
 
   const addMedication = (data: MedicationFormData) => {
     const newMedication: Medication = {
