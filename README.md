@@ -111,7 +111,8 @@ health-tracker/
 
 ### Prerequisites
 
-- Node.js 24 and npm
+- **Node.js 24 (LTS)** or newer
+- **npm**
 
 ### Installation
 
