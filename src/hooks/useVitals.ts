@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { StorageKeys, generateUUID } from "../lib/utils";
 import { toast } from "sonner";
@@ -11,21 +11,26 @@ const useVitals = (username: string | null) => {
     : "vitals-guest";
 
   const [vitals, setVitals] = useLocalStorage<VitalSigns[]>(storageKey, []);
+  const prevStorageKeyRef = useRef(storageKey);
 
   // Force re-read from localStorage when username changes
   useEffect(() => {
-    try {
-      const item = window.localStorage.getItem(storageKey);
-      const data = item ? JSON.parse(item) : [];
-      setVitals(data);
-    } catch (error) {
-      console.error("Error loading vitals:", error);
-      toast.error("Failed to load vitals", {
-        description: "Using empty list instead",
-      });
-      setVitals([]);
+    if (prevStorageKeyRef.current !== storageKey) {
+      prevStorageKeyRef.current = storageKey;
+
+      try {
+        const item = window.localStorage.getItem(storageKey);
+        const data = item ? JSON.parse(item) : [];
+        setVitals(data);
+      } catch (error) {
+        console.error("Error loading vitals:", error);
+        toast.error("Failed to load vitals", {
+          description: "Using empty list instead",
+        });
+        setVitals([]);
+      }
     }
-  }, [storageKey]);
+  }, [storageKey, setVitals]);
 
   const addVitalSigns = (data: VitalsFormData) => {
     try {

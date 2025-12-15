@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { StorageKeys, generateUUID, sanitizeInput } from "../lib/utils";
 import { toast } from "sonner";
@@ -14,21 +14,26 @@ const useMedications = (username: string | null) => {
     storageKey,
     []
   );
+  const prevStorageKeyRef = useRef(storageKey);
 
   // Force re-read from localStorage when username changes
   useEffect(() => {
-    try {
-      const item = window.localStorage.getItem(storageKey);
-      const data = item ? JSON.parse(item) : [];
-      setMedications(data);
-    } catch (error) {
-      console.error("Error loading medications:", error);
-      toast.error("Failed to load medications", {
-        description: "Using empty list instead",
-      });
-      setMedications([]);
+    if (prevStorageKeyRef.current !== storageKey) {
+      prevStorageKeyRef.current = storageKey;
+
+      try {
+        const item = window.localStorage.getItem(storageKey);
+        const data = item ? JSON.parse(item) : [];
+        setMedications(data);
+      } catch (error) {
+        console.error("Error loading medications:", error);
+        toast.error("Failed to load medications", {
+          description: "Using empty list instead",
+        });
+        setMedications([]);
+      }
     }
-  }, [storageKey]);
+  }, [storageKey, setMedications]);
 
   const addMedication = (data: MedicationFormData) => {
     try {
