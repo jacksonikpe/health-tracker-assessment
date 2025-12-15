@@ -5,10 +5,8 @@ import { toast } from "sonner";
 import useLocalStorage from "./useLocalStorage";
 import type { VitalsFormData, VitalSigns } from "@/types";
 
-const useVitals = (username: string | null) => {
-  const storageKey = username
-    ? StorageKeys.getVitalsKey(username)
-    : "vitals-guest";
+const useVitals = (username: string) => {
+  const storageKey = StorageKeys.getVitalsKey(username);
 
   const [vitals, setVitals] = useLocalStorage<VitalSigns[]>(storageKey, []);
   const prevStorageKeyRef = useRef(storageKey);

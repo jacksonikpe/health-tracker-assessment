@@ -5,10 +5,8 @@ import { toast } from "sonner";
 import useLocalStorage from "./useLocalStorage";
 import type { Medication, MedicationFormData } from "@/types";
 
-const useMedications = (username: string | null) => {
-  const storageKey = username
-    ? StorageKeys.getMedicationsKey(username)
-    : "medications-guest";
+const useMedications = (username: string) => {
+  const storageKey = StorageKeys.getMedicationsKey(username);
 
   const [medications, setMedications] = useLocalStorage<Medication[]>(
     storageKey,
