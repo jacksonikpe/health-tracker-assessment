@@ -19,6 +19,14 @@ export const sanitizeUsername = (username: string): string => {
 };
 
 /**
+ * Capitalizes the first letter of username for display
+ */
+export function capitalizeUsername(username: string): string {
+  if (!username) return "";
+  return username.charAt(0).toUpperCase() + username.slice(1);
+}
+
+/**
  * Validates username meets requirements
  * - Must be between 3 and 30 characters after sanitization
  * - Must contain at least one alphanumeric character

@@ -1,5 +1,6 @@
 import { LogOut } from "lucide-react";
 import { Button } from "../ui/button";
+import { capitalizeUsername } from "@/lib/utils";
 
 interface HeaderProps {
   username: string;
@@ -16,7 +17,10 @@ const Header = ({ username, onLogout }: HeaderProps) => {
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
             <span className="hidden sm:inline text-sm text-gray-600">
-              Welcome, <span className="font-semibold">{username}</span>
+              Welcome,{" "}
+              <span className="font-semibold">
+                {capitalizeUsername(username)}
+              </span>
             </span>
 
             <span className="sm:hidden text-sm font-semibold text-gray-800">

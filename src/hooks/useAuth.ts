@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { sanitizeUsername, validateUsername } from "../lib/utils";
+import {
+  capitalizeUsername,
+  sanitizeUsername,
+  validateUsername,
+} from "../lib/utils";
 import { toast } from "sonner";
 
 const useAuth = () => {
@@ -21,7 +25,7 @@ const useAuth = () => {
     sessionStorage.setItem("currentUser", sanitized);
     setCurrentUser(sanitized);
     toast.success("Welcome!", {
-      description: `Logged in as ${sanitized}`,
+      description: `Logged in as ${capitalizeUsername(sanitized)}`,
     });
     return true;
   };
@@ -31,7 +35,9 @@ const useAuth = () => {
     sessionStorage.removeItem("currentUser");
     setCurrentUser(null);
     toast.info("Logged Out", {
-      description: username ? `Goodbye, ${username}!` : "Session ended",
+      description: username
+        ? `Goodbye, ${capitalizeUsername(username)}!`
+        : "Session ended",
     });
   };
 
