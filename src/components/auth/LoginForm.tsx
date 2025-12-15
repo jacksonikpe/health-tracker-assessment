@@ -51,7 +51,7 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
                 autoFocus
                 minLength={3}
                 maxLength={30}
-                pattern="[a-zA-Z0-9_-]+"
+                pattern="[a-zA-Z0-9_\-]+"
                 title="Username must contain only letters, numbers, hyphens, and underscores"
               />
               <p className="text-xs text-muted-foreground">
