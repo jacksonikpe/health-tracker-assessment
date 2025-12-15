@@ -41,7 +41,9 @@ const MedicationForm = ({ onSubmit }: MedicationFormProps) => {
               value={formData.name}
               onChange={(e) => handleChange("name", e.target.value)}
               required
+              maxLength={100}
             />
+            <p className="text-xs text-muted-foreground">Max 100 characters</p>
           </div>
 
           <div className="space-y-2">
@@ -52,7 +54,9 @@ const MedicationForm = ({ onSubmit }: MedicationFormProps) => {
               value={formData.dosage}
               onChange={(e) => handleChange("dosage", e.target.value)}
               required
+              maxLength={50}
             />
+            <p className="text-xs text-muted-foreground">Max 50 characters</p>
           </div>
 
           <div className="space-y-2">
@@ -63,7 +67,9 @@ const MedicationForm = ({ onSubmit }: MedicationFormProps) => {
               value={formData.frequency}
               onChange={(e) => handleChange("frequency", e.target.value)}
               required
+              maxLength={200}
             />
+            <p className="text-xs text-muted-foreground">Max 200 characters</p>
           </div>
 
           <Button type="submit" className="w-full">
