@@ -24,20 +24,19 @@ const VitalsForm = ({ onSubmit }: VitalsFormProps) => {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
-    // Validation
     const newErrors: Partial<Record<keyof VitalsFormData, string>> = {};
 
     if (formData.systolic < 70 || formData.systolic > 250) {
-      newErrors.systolic = "Systolic must be between 70-250 mmHg";
+      newErrors.systolic = "Systolic must be between 70–250 mmHg";
     }
     if (formData.diastolic < 40 || formData.diastolic > 150) {
-      newErrors.diastolic = "Diastolic must be between 40-150 mmHg";
+      newErrors.diastolic = "Diastolic must be between 40–150 mmHg";
     }
     if (formData.heartRate < 30 || formData.heartRate > 220) {
-      newErrors.heartRate = "Heart rate must be between 30-220 BPM";
+      newErrors.heartRate = "Heart rate must be between 30–220 BPM";
     }
     if (formData.weight < 1 || formData.weight > 1000) {
-      newErrors.weight = "Weight must be between 1-1000 lbs";
+      newErrors.weight = "Weight must be between 1–1000 lbs";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -51,23 +50,25 @@ const VitalsForm = ({ onSubmit }: VitalsFormProps) => {
   };
 
   const handleChange = (field: keyof VitalsFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: Number(value) }));
-    // Clear error when user starts typing
+    const numValue = value === "" ? 0 : Number(value);
+    setFormData((prev) => ({ ...prev, [field]: numValue }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
   return (
-    <Card>
+    <Card className="border-gray-200 shadow-sm">
       <CardHeader>
-        <CardTitle>Log Vital Signs</CardTitle>
+        <CardTitle className="text-gray-800">Log Vital Signs</CardTitle>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+      <CardContent className="space-y-3 min-h-87 overflow-y-auto">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="systolic">Systolic (mmHg)</Label>
+              <Label htmlFor="systolic" className="text-gray-700">
+                Systolic (mmHg)
+              </Label>
               <Input
                 id="systolic"
                 type="number"
@@ -78,6 +79,7 @@ const VitalsForm = ({ onSubmit }: VitalsFormProps) => {
                 onChange={(e) => handleChange("systolic", e.target.value)}
                 required
                 aria-invalid={!!errors.systolic}
+                className="focus-visible:ring-blue-500"
               />
               {errors.systolic && (
                 <p className="text-sm text-red-500">{errors.systolic}</p>
@@ -85,7 +87,9 @@ const VitalsForm = ({ onSubmit }: VitalsFormProps) => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="diastolic">Diastolic (mmHg)</Label>
+              <Label htmlFor="diastolic" className="text-gray-700">
+                Diastolic (mmHg)
+              </Label>
               <Input
                 id="diastolic"
                 type="number"
@@ -96,6 +100,7 @@ const VitalsForm = ({ onSubmit }: VitalsFormProps) => {
                 onChange={(e) => handleChange("diastolic", e.target.value)}
                 required
                 aria-invalid={!!errors.diastolic}
+                className="focus-visible:ring-blue-500"
               />
               {errors.diastolic && (
                 <p className="text-sm text-red-500">{errors.diastolic}</p>
@@ -104,7 +109,9 @@ const VitalsForm = ({ onSubmit }: VitalsFormProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="heart-rate">Heart Rate (BPM)</Label>
+            <Label htmlFor="heart-rate" className="text-gray-700">
+              Heart Rate (BPM)
+            </Label>
             <Input
               id="heart-rate"
               type="number"
@@ -115,6 +122,7 @@ const VitalsForm = ({ onSubmit }: VitalsFormProps) => {
               onChange={(e) => handleChange("heartRate", e.target.value)}
               required
               aria-invalid={!!errors.heartRate}
+              className="focus-visible:ring-blue-500"
             />
             {errors.heartRate && (
               <p className="text-sm text-red-500">{errors.heartRate}</p>
@@ -122,7 +130,9 @@ const VitalsForm = ({ onSubmit }: VitalsFormProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="weight">Weight (lbs)</Label>
+            <Label htmlFor="weight" className="text-gray-700">
+              Weight (lbs)
+            </Label>
             <Input
               id="weight"
               type="number"
@@ -134,13 +144,14 @@ const VitalsForm = ({ onSubmit }: VitalsFormProps) => {
               onChange={(e) => handleChange("weight", e.target.value)}
               required
               aria-invalid={!!errors.weight}
+              className="focus-visible:ring-blue-500"
             />
             {errors.weight && (
               <p className="text-sm text-red-500">{errors.weight}</p>
             )}
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full mt-2">
             Log Vitals
           </Button>
         </form>

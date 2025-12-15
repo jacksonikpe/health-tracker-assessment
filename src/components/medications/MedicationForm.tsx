@@ -27,14 +27,16 @@ const MedicationForm = ({ onSubmit }: MedicationFormProps) => {
   };
 
   return (
-    <Card>
+    <Card className="border-gray-200 shadow-sm">
       <CardHeader>
-        <CardTitle>Add Medication</CardTitle>
+        <CardTitle className="text-gray-800">Add Medication</CardTitle>
       </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <CardContent className="space-y-3 min-h-87 overflow-y-auto">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-2">
-            <Label htmlFor="med-name">Medication Name</Label>
+            <Label htmlFor="med-name" className="text-gray-700">
+              Medication Name
+            </Label>
             <Input
               id="med-name"
               placeholder="e.g., Lisinopril"
@@ -42,12 +44,15 @@ const MedicationForm = ({ onSubmit }: MedicationFormProps) => {
               onChange={(e) => handleChange("name", e.target.value)}
               required
               maxLength={100}
+              className="focus-visible:ring-blue-500"
             />
-            <p className="text-xs text-muted-foreground">Max 100 characters</p>
+            <p className="text-xs text-gray-500">Max 100 characters</p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dosage">Dosage</Label>
+            <Label htmlFor="dosage" className="text-gray-700">
+              Dosage
+            </Label>
             <Input
               id="dosage"
               placeholder="e.g., 20mg"
@@ -55,12 +60,15 @@ const MedicationForm = ({ onSubmit }: MedicationFormProps) => {
               onChange={(e) => handleChange("dosage", e.target.value)}
               required
               maxLength={50}
+              className="focus-visible:ring-blue-500"
             />
-            <p className="text-xs text-muted-foreground">Max 50 characters</p>
+            <p className="text-xs text-gray-500">Max 50 characters</p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="frequency">Frequency</Label>
+            <Label htmlFor="frequency" className="text-gray-700">
+              Frequency
+            </Label>
             <Input
               id="frequency"
               placeholder="e.g., Once daily in the morning"
@@ -68,11 +76,12 @@ const MedicationForm = ({ onSubmit }: MedicationFormProps) => {
               onChange={(e) => handleChange("frequency", e.target.value)}
               required
               maxLength={200}
+              className="focus-visible:ring-blue-500"
             />
-            <p className="text-xs text-muted-foreground">Max 200 characters</p>
+            <p className="text-xs text-gray-500">Max 200 characters</p>
           </div>
 
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full mt-2">
             Add Medication
           </Button>
         </form>
