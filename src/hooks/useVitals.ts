@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 
+import { StorageKeys, generateUUID } from "../lib/utils";
+import { toast } from "sonner";
 import useLocalStorage from "./useLocalStorage";
 import type { VitalsFormData, VitalSigns } from "@/types";
-import { StorageKeys } from "@/lib/utils";
 
 const useVitals = (username: string | null) => {
   const storageKey = username
@@ -19,18 +20,32 @@ const useVitals = (username: string | null) => {
       setVitals(data);
     } catch (error) {
       console.error("Error loading vitals:", error);
+      toast.error("Failed to load vitals", {
+        description: "Using empty list instead",
+      });
       setVitals([]);
     }
-  }, [setVitals, storageKey]);
+  }, [storageKey]);
 
   const addVitalSigns = (data: VitalsFormData) => {
-    const newVital: VitalSigns = {
-      id: crypto.randomUUID(),
-      ...data,
-      timestamp: new Date().toISOString(),
-    };
-    // Add to beginning for reverse chronological order
-    setVitals((prev) => [newVital, ...prev]);
+    try {
+      const newVital: VitalSigns = {
+        id: generateUUID(),
+        ...data,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Add to beginning for reverse chronological order
+      setVitals((prev) => [newVital, ...prev]);
+      toast.success("Vitals Logged", {
+        description: "Your vital signs have been recorded",
+      });
+    } catch (error) {
+      console.error("Error adding vital signs:", error);
+      toast.error("Failed to log vitals", {
+        description: "Please try again",
+      });
+    }
   };
 
   return { vitals, addVitalSigns };

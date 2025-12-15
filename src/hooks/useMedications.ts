@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
-import { StorageKeys } from "@/lib/utils";
+import { StorageKeys, generateUUID, sanitizeInput } from "../lib/utils";
+import { toast } from "sonner";
 import useLocalStorage from "./useLocalStorage";
 import type { Medication, MedicationFormData } from "@/types";
 
@@ -22,21 +23,48 @@ const useMedications = (username: string | null) => {
       setMedications(data);
     } catch (error) {
       console.error("Error loading medications:", error);
+      toast.error("Failed to load medications", {
+        description: "Using empty list instead",
+      });
       setMedications([]);
     }
-  }, [setMedications, storageKey]);
+  }, [storageKey]);
 
   const addMedication = (data: MedicationFormData) => {
-    const newMedication: Medication = {
-      id: crypto.randomUUID(),
-      ...data,
-      createdAt: new Date().toISOString(),
-    };
-    setMedications((prev) => [...prev, newMedication]);
+    try {
+      // Sanitize inputs
+      const newMedication: Medication = {
+        id: generateUUID(),
+        name: sanitizeInput(data.name),
+        dosage: sanitizeInput(data.dosage),
+        frequency: sanitizeInput(data.frequency),
+        createdAt: new Date().toISOString(),
+      };
+
+      setMedications((prev) => [...prev, newMedication]);
+      toast.success("Medication Added", {
+        description: `${newMedication.name} has been added to your list`,
+      });
+    } catch (error) {
+      console.error("Error adding medication:", error);
+      toast.error("Failed to add medication", {
+        description: "Please try again",
+      });
+    }
   };
 
   const removeMedication = (id: string) => {
-    setMedications((prev) => prev.filter((med) => med.id !== id));
+    try {
+      setMedications((prev) => prev.filter((med) => med.id !== id));
+      toast.success("Medication Removed", {
+        description: "Medication has been removed from your list",
+      });
+    } catch (error) {
+      console.error("Error removing medication:", error);
+      toast.error("Failed to remove medication", {
+        description: "Please try again",
+      });
+    }
   };
 
   return { medications, addMedication, removeMedication };
