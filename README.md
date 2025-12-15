@@ -37,6 +37,40 @@ A single-page React application for tracking medications and vital signs with us
 - **Date Formatting:** date-fns
 - **Icons:** lucide-react
 
+## 🔒 Security & Data Safety
+
+### Input Sanitization
+
+- **Username Validation**: 3-30 characters, alphanumeric with hyphens/underscores only
+- **Case Insensitivity**: `Jackson` and `jackson` treated as same user
+- **XSS Prevention**: All text inputs sanitized to remove HTML tags and script injection attempts
+- **Special Characters**: Usernames encoded in storage keys to prevent key collision
+
+### Data Protection
+
+- **User Isolation**: Data is completely isolated between users using encoded storage keys
+- **LocalStorage Limits**: Warning shown when approaching 5MB browser storage limit
+- **Corrupted Data Handling**: Graceful fallback to empty state if data becomes corrupted
+- **Browser Compatibility**: UUID generation with fallback for older browsers (iOS < 15.4)
+
+### Input Constraints
+
+- **Medication Name**: Max 100 characters
+- **Dosage**: Max 50 characters
+- **Frequency**: Max 200 characters
+- **Vital Signs**: Validated ranges
+  - Systolic BP: 70-250 mmHg
+  - Diastolic BP: 40-150 mmHg
+  - Heart Rate: 30-220 BPM
+  - Weight: 1-1000 lbs
+
+### Session Management
+
+- **Auto-Logout**: Automatic logout after 5 minutes of inactivity
+- **Inactivity Warning**: Toast notification 2 minutes before auto-logout
+- **Manual Logout**: Available at any time via header button
+- **Activity Detection**: Mouse, keyboard, scroll, touch events reset timer
+
 ## 📁 Project Structure
 
 ```
@@ -146,8 +180,28 @@ npm run preview  # Preview production build locally
    - Should automatically logout and return to login screen
 
 5. **Responsive Design**
+
    - Resize browser window or use mobile device
    - Layout should adapt (single column on mobile, two columns on desktop)
+
+6. **Security Testing**
+
+   - Try username with special characters (e.g., `<script>alert('xss')</script>`)
+     - Should be sanitized and login rejected
+   - Try username "Jackson" then "jackson"
+     - Should access same data (case-insensitive)
+   - Try extremely long medication name (500 characters)
+     - Should be limited to 100 characters
+   - Try invalid vitals (e.g., Systolic 999)
+     - Should show validation error
+
+7. **Edge Cases**
+   - Fill storage with many entries
+     - Should show warning near 5MB limit
+   - Try logging in with just spaces
+     - Should show validation error
+   - Refresh page multiple times
+     - Data should persist correctly
 
 ## 🏗️ Architecture Decisions
 
@@ -221,6 +275,15 @@ medications - jane; // Jane's medications (isolated)
 - **Diastolic BP**: 40-150 mmHg
 - **Heart Rate**: 30-220 BPM
 - **Weight**: 1-1000 lbs
+
+## 🐛 Known Limitations
+
+1. **No data export/import** - Data is only in localStorage
+2. **No medication/vitals editing** - Only add/remove operations
+3. **No data visualization** - Plain list view only
+4. **No multi-device sync** - Data is local to browser
+5. **5-minute auto-logout** - Spec mentioned 10 min in description but 5 min in acceptance criteria; implemented 5 min per acceptance criteria
+6. **Storage limits** - Browser localStorage typically limited to 5-10MB
 
 ## 🤝 Development Notes
 
