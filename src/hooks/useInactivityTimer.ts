@@ -54,9 +54,6 @@ const useInactivityTimer = (onInactive: () => void, isActive: boolean) => {
 
       // Set logout timer
       timeoutRef.current = window.setTimeout(() => {
-        toast.error("Session Expired", {
-          description: "You have been logged out due to inactivity",
-        });
         callbackRef.current();
       }, INACTIVITY_TIMEOUT);
     };
