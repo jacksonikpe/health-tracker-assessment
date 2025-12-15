@@ -43,6 +43,7 @@ A single-page React application for tracking medications and vital signs with us
 
 - **Username Validation**: 3-30 characters, alphanumeric with hyphens/underscores only
 - **Case Insensitivity**: `Jackson` and `jackson` treated as same user
+- **Display Formatting**: First letter capitalized for display (e.g., "jackson" → "Jackson")
 - **XSS Prevention**: All text inputs sanitized to remove HTML tags and script injection attempts
 - **Special Characters**: Usernames encoded in storage keys to prevent key collision
 
@@ -147,7 +148,9 @@ npm run preview  # Preview production build locally
 ### Test Credentials
 
 - **Any username works** - just enter a username to login (e.g., "john", "jane", "test-user")
+- Usernames are case-insensitive: "Jackson", "jackson", and "JACKSON" all access the same account
 - Data is automatically scoped to each username
+- Username display is capitalized for better UX (e.g., "jackson" displays as "Jackson")
 - No password required per specification
 
 ### Test Scenarios
@@ -174,17 +177,26 @@ npm run preview  # Preview production build locally
    - Login as "user2" - should see no data (fresh start)
    - Logout and login back as "user1" - original data should be there
 
-4. **Auto-Logout**
+4. **Case-Insensitive Username Behavior**
+
+   - Login as "Jackson", add a medication
+   - Logout
+   - Login as "jackson" (lowercase) - should see the same medication
+   - Login as "JACKSON" (uppercase) - should still see the same medication
+   - All variations access the same user account
+   - Username always displays as "Jackson" (capitalized) in the header
+
+5. **Auto-Logout**
 
    - Login and wait 5 minutes without interaction
    - Should automatically logout and return to login screen
 
-5. **Responsive Design**
+6. **Responsive Design**
 
    - Resize browser window or use mobile device
    - Layout should adapt (single column on mobile, two columns on desktop)
 
-6. **Security Testing**
+7. **Security Testing**
 
    - Try username with special characters (e.g., `<script>alert('xss')</script>`)
      - Should be sanitized and login rejected
@@ -195,7 +207,7 @@ npm run preview  # Preview production build locally
    - Try invalid vitals (e.g., Systolic 999)
      - Should show validation error
 
-7. **Edge Cases**
+8. **Edge Cases**
    - Fill storage with many entries
      - Should show warning near 5MB limit
    - Try logging in with just spaces
@@ -241,12 +253,77 @@ npm run preview  # Preview production build locally
 
 ### Storage Key Namespacing
 
+The application uses a robust storage key strategy with sanitization and encoding:
+
+#### Process Flow:
+
+1. **Input**: User enters "Jackson"
+2. **Sanitization**: Converts to lowercase → "jackson"
+3. **Encoding**: Base64 encode → "amFja3Nvbg=="
+4. **Storage Key**: Prefix with data type → "medications-amFja3Nvbg=="
+
+#### Code Implementation:
+
 ```typescript
-// Pattern: {dataType}-{username}
-medications - john; // John's medications
-vitals - john; // John's vitals
-medications - jane; // Jane's medications (isolated)
+// Sanitize: lowercase + remove special chars
+const sanitizeUsername = (username: string): string => {
+  return username
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9_-]/g, "");
+};
+
+// Encode: base64 for safe storage keys
+const encodeStorageKey = (username: string): string => {
+  return btoa(encodeURIComponent(username));
+};
+
+// Generate keys with prefix
+const StorageKeys = {
+  getMedicationsKey: (username: string) =>
+    `medications-${encodeStorageKey(username)}`,
+  getVitalsKey: (username: string) => `vitals-${encodeStorageKey(username)}`,
+};
 ```
+
+#### Examples in localStorage:
+
+| User Input | Sanitized | Encoded      | Medications Key          |
+| ---------- | --------- | ------------ | ------------------------ |
+| Jackson    | jackson   | amFja3Nvbg== | medications-amFja3Nvbg== |
+| john-doe   | john-doe  | am9obi1kb2U= | medications-am9obi1kb2U= |
+| JANE       | jane      | amFuZQ==     | medications-amFuZQ==     |
+| user_123   | user_123  | dXNlcl8xMjM= | medications-dXNlcl8xMjM= |
+
+#### Why This Approach?
+
+**Case-Insensitivity:**
+
+- "Jackson", "jackson", and "JACKSON" all sanitize to "jackson"
+- All produce the same encoded key: "amFja3Nvbg=="
+- Ensures data consistency regardless of how user types their username
+
+**Special Character Safety:**
+
+- Characters like `@`, `!`, `#` are removed during sanitization
+- Hyphens and underscores are preserved (common in usernames)
+- Base64 encoding ensures no invalid characters in storage keys
+
+**Collision Prevention:**
+
+- Encoding creates unique, deterministic keys for each username
+- Impossible for different usernames to produce the same key
+- Mathematical guarantee of uniqueness
+
+**Debugging-Friendly:**
+
+- Base64 is reversible: `atob("amFja3Nvbg==")` → "jackson"
+- Can inspect localStorage and decode keys to see which user they belong to
+- Example: Open DevTools → Application → Local Storage → decode key manually
+
+#### Security Note:
+
+This is **not encryption** - it's encoding for key safety. Data stored in localStorage is still readable.
 
 ## 🎨 Design Choices
 
