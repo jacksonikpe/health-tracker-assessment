@@ -12,9 +12,6 @@ import useInactivityTimer from "./hooks/useInactivityTimer";
 
 function App() {
   const { currentUser, login, logout, isAuthenticated } = useAuth();
-  const { medications, addMedication, removeMedication } =
-    useMedications(currentUser);
-  const { vitals, addVitalSigns } = useVitals(currentUser);
 
   // Auto-logout after 5 minutes of inactivity
   useInactivityTimer(logout, isAuthenticated);
@@ -23,9 +20,23 @@ function App() {
     return <LoginForm onLogin={login} />;
   }
 
+  return <AuthenticatedApp currentUser={currentUser!} logout={logout} />;
+}
+
+function AuthenticatedApp({
+  currentUser,
+  logout,
+}: {
+  currentUser: string;
+  logout: () => void;
+}) {
+  const { medications, addMedication, removeMedication } =
+    useMedications(currentUser);
+  const { vitals, addVitalSigns } = useVitals(currentUser);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header username={currentUser!} onLogout={logout} />
+      <Header username={currentUser} onLogout={logout} />
       <AppLayout>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Medications Section */}
